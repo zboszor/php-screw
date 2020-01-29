@@ -59,6 +59,9 @@ ZEND_API zend_op_array *pm9screw_compile_file(zend_file_handle *file_handle, int
 	FILE	*fp;
 	char	buf[PM9SCREW_LEN + 1];
 	const char	*fname = NULL;
+#if PHP_VERSION_ID >= 70000
+	char	*opened_path;
+#endif
 
 	if (zend_is_executing(TSRMLS_C))
 		fname = get_active_function_name(TSRMLS_C);
@@ -84,7 +87,13 @@ ZEND_API zend_op_array *pm9screw_compile_file(zend_file_handle *file_handle, int
 	if (file_handle->type == ZEND_HANDLE_FD) close(file_handle->handle.fd);
 	file_handle->handle.fp = pm9screw_ext_fopen(fp);
 	file_handle->type = ZEND_HANDLE_FP;
+
+#if PHP_VERSION_ID < 70000
 	file_handle->opened_path = expand_filepath(file_handle->filename, NULL TSRMLS_CC);
+#else
+	opened_path = expand_filepath(file_handle->filename, NULL TSRMLS_CC);
+	file_handle->opened_path = zend_string_init(opened_path, strlen(opened_path), 0);
+#endif
 
 	return org_compile_file(file_handle, type);
 }
