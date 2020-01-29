@@ -22,11 +22,10 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 
 	z.next_in = Z_NULL;
 	z.avail_in = 0;
-	if (mode == 0) {
+	if (mode == 0)
 		deflateInit(&z, 1);
-	} else {
+	else
 		inflateInit(&z);
-	}
 
 	outbuf = emalloc(OUTBUFSIZ);
 	resultbuf = emalloc(OUTBUFSIZ);
@@ -37,18 +36,16 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 	z.avail_in = inbuf_len;
 
 	while (1) {
-		if (mode == 0) {
+		if (mode == 0)
 				status = deflate(&z, Z_FINISH);
-		} else {
+		else
 				status = inflate(&z, Z_NO_FLUSH);
-		}
 		if (status == Z_STREAM_END) break;
 		if (status != Z_OK) {
-			if (mode == 0) {
+			if (mode == 0)
 				deflateEnd(&z);
-			} else {
+			else
 				inflateEnd(&z);
-			}
 			*resultbuf_len = 0;
 			efree(outbuf);
 			return resultbuf;
@@ -66,11 +63,10 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 		memcpy(resultbuf + total_count, outbuf, count);
 		total_count += count;
 	}
-	if (mode == 0) {
+	if (mode == 0)
 		deflateEnd(&z);
-	} else {
+	else
 		inflateEnd(&z);
-	}
 	*resultbuf_len = total_count;
 	efree(outbuf);
 	return resultbuf;
