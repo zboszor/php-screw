@@ -37,9 +37,9 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 
 	while (1) {
 		if (mode == 0)
-				status = deflate(&z, Z_FINISH);
+			status = deflate(&z, Z_FINISH);
 		else
-				status = inflate(&z, Z_NO_FLUSH);
+			status = inflate(&z, Z_NO_FLUSH);
 		if (status == Z_STREAM_END) break;
 		if (status != Z_OK) {
 			if (mode == 0)
