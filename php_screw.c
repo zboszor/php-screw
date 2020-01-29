@@ -58,7 +58,7 @@ ZEND_API zend_op_array *pm9screw_compile_file(zend_file_handle *file_handle, int
 {
 	FILE	*fp;
 	char	buf[PM9SCREW_LEN + 1];
-	char	*fname = NULL;
+	const char	*fname = NULL;
 
 	if (zend_is_executing(TSRMLS_C))
 		fname = get_active_function_name(TSRMLS_C);
