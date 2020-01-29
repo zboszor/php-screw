@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "../php_screw.h"
 #include "../my_screw.h"
 
-main(int argc, char**argv)
+int main(int argc, char **argv)
 {
 	FILE	*fp;
 	struct	stat	stat_buf;
