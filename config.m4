@@ -15,4 +15,7 @@ dnl Make sure that the comment is aligned:
 if test "$PHP_php_screw" != "no"; then
   dnl Action..
   PHP_EXTENSION(php_screw, $ext_shared)
+  ZLIB_LDFLAGS="-lz"
+  PHP_EVAL_LIBLINE($ZLIB_LDFLAGS, PHP_SCREW_SHARED_LIBADD)
+  PHP_SUBST(PHP_SCREW_SHARED_LIBADD)
 fi
