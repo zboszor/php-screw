@@ -5,14 +5,14 @@
 
 #define OUTBUFSIZ  100000
 
-z_stream z;
-char outbuf[OUTBUFSIZ];
-
 char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 {
+	z_stream z;
 	int count, status;
-	char *resultbuf;
+	char *outbuf, *resultbuf;
 	int total_count = 0;
+
+	memset(&z, 0, sizeof(z));
 
 	z.zalloc = Z_NULL;
 	z.zfree = Z_NULL;
@@ -26,12 +26,13 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 		inflateInit(&z);
 	}
 
+	outbuf = malloc(OUTBUFSIZ);
+	resultbuf = malloc(OUTBUFSIZ);
+
 	z.next_out = outbuf;
 	z.avail_out = OUTBUFSIZ;
 	z.next_in = inbuf;
 	z.avail_in = inbuf_len;
-
-	resultbuf = malloc(OUTBUFSIZ);
 
 	while (1) {
 		if (mode == 0) {
@@ -47,7 +48,8 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 				inflateEnd(&z);
 			}
 			*resultbuf_len = 0;
-			return(resultbuf);
+			free(outbuf);
+			return resultbuf;
 		}
 		if (z.avail_out == 0) {
 			resultbuf = realloc(resultbuf, total_count + OUTBUFSIZ);
@@ -68,7 +70,8 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 		inflateEnd(&z);
 	}
 	*resultbuf_len = total_count;
-	return(resultbuf);
+	free(outbuf);
+	return resultbuf;
 }
 
 char *zencode(char *inbuf, int inbuf_len, int *resultbuf_len)
