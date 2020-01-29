@@ -3,6 +3,8 @@
 #include <zlib.h>
 #include <string.h>
 
+#include <php.h>
+
 #define OUTBUFSIZ  100000
 
 char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
@@ -26,8 +28,8 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 		inflateInit(&z);
 	}
 
-	outbuf = malloc(OUTBUFSIZ);
-	resultbuf = malloc(OUTBUFSIZ);
+	outbuf = emalloc(OUTBUFSIZ);
+	resultbuf = emalloc(OUTBUFSIZ);
 
 	z.next_out = outbuf;
 	z.avail_out = OUTBUFSIZ;
@@ -48,11 +50,11 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 				inflateEnd(&z);
 			}
 			*resultbuf_len = 0;
-			free(outbuf);
+			efree(outbuf);
 			return resultbuf;
 		}
 		if (z.avail_out == 0) {
-			resultbuf = realloc(resultbuf, total_count + OUTBUFSIZ);
+			resultbuf = erealloc(resultbuf, total_count + OUTBUFSIZ);
 			memcpy(resultbuf + total_count, outbuf, OUTBUFSIZ);
 			total_count += OUTBUFSIZ;
 			z.next_out = outbuf;
@@ -60,7 +62,7 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 		}
 	}
 	if ((count = OUTBUFSIZ - z.avail_out) != 0) {
-		resultbuf = realloc(resultbuf, total_count + OUTBUFSIZ);
+		resultbuf = erealloc(resultbuf, total_count + OUTBUFSIZ);
 		memcpy(resultbuf + total_count, outbuf, count);
 		total_count += count;
 	}
@@ -70,7 +72,7 @@ char *zcodecom(int mode, char *inbuf, int inbuf_len, int *resultbuf_len)
 		inflateEnd(&z);
 	}
 	*resultbuf_len = total_count;
-	free(outbuf);
+	efree(outbuf);
 	return resultbuf;
 }
 
