@@ -74,13 +74,13 @@ ZEND_API zend_op_array *pm9screw_compile_file(zend_file_handle *file_handle, int
 
 	fp = fopen(file_handle->filename, "r");
 	if (!fp) {
-		return org_compile_file(file_handle, type);
+		return org_compile_file(file_handle, type TSRMLS_CC);
 	}
 
 	fread(buf, PM9SCREW_LEN, 1, fp);
 	if (memcmp(buf, PM9SCREW, PM9SCREW_LEN) != 0) {
 		fclose(fp);
-		return org_compile_file(file_handle, type);
+		return org_compile_file(file_handle, type TSRMLS_CC);
 	}
 
 	if (file_handle->type == ZEND_HANDLE_FP) fclose(file_handle->handle.fp);
@@ -95,7 +95,7 @@ ZEND_API zend_op_array *pm9screw_compile_file(zend_file_handle *file_handle, int
 	file_handle->opened_path = zend_string_init(opened_path, strlen(opened_path), 0);
 #endif
 
-	return org_compile_file(file_handle, type);
+	return org_compile_file(file_handle, type TSRMLS_CC);
 }
 
 zend_module_entry php_screw_module_entry = {
