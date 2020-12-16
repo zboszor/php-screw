@@ -23,6 +23,12 @@
 #include "php_screw.h"
 #include "my_screw.h"
 
+#if PHP_MAJOR_VERSION >= 8
+#define TSRMLS_C
+#define TSRMLS_CC
+#define TSRMLS_DC
+#endif
+
 #if PHP_VERSION_ID >= 70300
 static int (*php_screw_orig_post_startup_cb)(void);
 static int php_screw_post_startup(void);
