@@ -79,7 +79,7 @@
 
  (6) Add the next line to php.ini or to its own file like /etc/php.d/01-screw.ini
 
-       extension=php_screw.so
+       zend_extension=php_screw.so
 
  (7) Restart the httpd daemon.
 
