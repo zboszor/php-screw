@@ -1,4 +1,4 @@
-                    [ PHP Screw - User's Manual ver1.5 ]
+                    [ PHP Screw - User's Manual ver 1.9 ]
 
 1. What's SCREW?
 
@@ -34,20 +34,18 @@
 
 3. Requirement
 
- (1) PHP5.x
-     NOTICE: PHP must be compiled with the "--with-zlib" option.
-     Check that PHP has zlib compiled in it with the PHP script:
-     "<? gzopen(); ?>"
-     If PHP knows about the function you can happily proceed.
+ (1) PHP 5.x, 7.x, 8.x
 
- (2) UNIX like OS (LINUX, FreeBSD, etc. are included) 
+ (2) zlib
+
+ (3) UNIX like OS (LINUX, FreeBSD, etc. are included)
 
 
 4. Installation.
 
- (1) Unpack php_screw-1.5.tgz.
+ (1) Unpack php-screw-1.9.tar.gz
 
- (2) Execute the following command with directory php_screw-1.5
+ (2) Execute the following command with directory php-screw-1.9
 
        phpize
        ./configure
@@ -71,15 +69,15 @@
 		 PM9SCREW and PM9SCREW_LEN in php_screw.h. PM9SCREW_LEN must
 		 be less than or equal to the size of PM9SCREW.
 
- (4) Compile the decryptor
+ (4) Compile the decryption module
 
        make
 
- (5) Copy modules/php_screw.so into an extension directory.
+ (5) Install modules/php_screw.so into an extension directory.
 
-       ex) cp modules/php_screw.so /usr/lib/php/modules/php_screw.so
+       sudo make install
 
- (6) Add the next line to php.ini.
+ (6) Add the next line to php.ini or to its own file like /etc/php.d/01-screw.ini
 
        extension=php_screw.so
 
@@ -90,7 +88,7 @@
        cd tools
        make
 
- (9) Copy the encryptor ("screw") into an appropriate directory.
+ (9) Copy the encryption tool ("screw") into an appropriate directory.
 
 
 5. User's manual.
@@ -119,9 +117,14 @@
  2002/08/02 PHP Screw ver1.2 -- Changed encryption algorithm
  2004/01/11 PHP Screw ver1.3 -- Changed to BSD License(revised), Correspondence to php-4.3.x
  2007/10/11 PHP Screw ver1.5 -- Correspondence to PHP5.x
+ 2020-10-09 PHP Screw version 1.6 -- Rewrite as a Zend extension, initial support for up to PHP 7.4, cleaned up old end-of-life PHP suppport
+ 2020-10-09 PHP Screw version 1.7 -- Fixed build with PHP 7.4
+ 2020-12-16 PHP Screw version 1.8 -- Support for PHP 8.0
+ 2023-07-07 PHP Screw version 1.9 -- Support for PHP 8.1 and 8.2
 
 
 7. Copyright
  (C) 2007 Kunimasa Noda/PM9.com, Inc.
  contact:  http://www.pm9.com,  kuni@pm9.com
 
+ (C) 2020-2022 Zoltán Böszörményi <zboszor@gmail.com>
