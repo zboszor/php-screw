@@ -28,3 +28,5 @@ run-tests.php
 modules/
 *.la
 *.lo
+*.dep
+tools/screw
