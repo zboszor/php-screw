@@ -48,7 +48,7 @@ FILE *pm9screw_ext_fopen(FILE *fp)
 	int	i;
 
 	fstat(fileno(fp), &stat_buf);
-	datalen = stat_buf.st_size - PM9SCREW_LEN;
+	datalen = stat_buf.st_size - ftell(fp);
 	datap = emalloc(datalen);
 	memset(datap, 0, datalen);
 	fread(datap, datalen, 1, fp);
@@ -99,6 +99,21 @@ ZEND_API zend_op_array *pm9screw_compile_file(zend_file_handle *file_handle, int
 	}
 
 	fread(buf, PM9SCREW_LEN, 1, fp);
+
+	if (memcmp(buf, "#!", 2) == 0) {
+		/* Shebang line found, ignore it. */
+		char *lineptr = NULL;
+		size_t bufsize = 0;
+		ssize_t line_len;
+
+		rewind(fp);
+
+		line_len = getline(&lineptr, &bufsize, fp);
+		if (line_len > 0 && bufsize > 0 && lineptr)
+			free(lineptr);
+
+		fread(buf, PM9SCREW_LEN, 1, fp);
+	}
 	if (memcmp(buf, PM9SCREW, PM9SCREW_LEN) != 0) {
 		fclose(fp);
 		return org_compile_file(file_handle, type TSRMLS_CC);
