@@ -50,12 +50,12 @@ FILE *pm9screw_ext_fopen(FILE *fp)
 	fstat(fileno(fp), &stat_buf);
 	datalen = stat_buf.st_size - PM9SCREW_LEN;
 	datap = emalloc(datalen);
+	memset(datap, 0, datalen);
 	fread(datap, datalen, 1, fp);
 	fclose(fp);
 
-	for(i=0; i<datalen; i++) {
+	for (i = 0; i < datalen; i++)
 		datap[i] = (char)pm9screw_mycryptkey[(datalen - i) % cryptkey_len] ^ (~(datap[i]));
-	}
 
 	newdatap = zdecode(datap, datalen, &newdatalen);
 
