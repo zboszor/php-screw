@@ -42,7 +42,7 @@ PHP_MINFO_FUNCTION(php_screw);
 FILE *pm9screw_ext_fopen(FILE *fp)
 {
 	struct	stat	stat_buf;
-	char	*datap, *newdatap;
+	unsigned char *datap, *newdatap;
 	int	datalen, newdatalen;
 	int	cryptkey_len = sizeof pm9screw_mycryptkey / 2;
 	int	i;
