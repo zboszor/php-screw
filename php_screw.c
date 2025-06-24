@@ -90,9 +90,9 @@ ZEND_API zend_op_array *pm9screw_compile_file(zend_file_handle *file_handle, int
 	}
 
 #if PHP_VERSION_ID >= 80100
-	fp = fopen(ZSTR_VAL(file_handle->filename), "r");
+	fp = fopen(ZSTR_VAL(file_handle->filename), "rb");
 #else
-	fp = fopen(file_handle->filename, "r");
+	fp = fopen(file_handle->filename, "rb");
 #endif
 	if (!fp) {
 		return org_compile_file(file_handle, type TSRMLS_CC);

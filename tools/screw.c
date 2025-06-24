@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "Usage: filename.\n");
 		return 0;
 	}
-	fp = fopen(argv[1], "r");
+	fp = fopen(argv[1], "rb");
 	if (fp == NULL) {
 		fprintf(stderr, "File not found(%s)\n", argv[1]);
 		return 1;
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 	for (i = 0; i < newdatalen; i++)
 		newdatap[i] = (char)pm9screw_mycryptkey[(newdatalen - i) % cryptkey_len] ^ (~(newdatap[i]));
 
-	fp = fopen(argv[1], "w");
+	fp = fopen(argv[1], "wb");
 	if (fp == NULL) {
 		fprintf(stderr, "Can not create crypt file(%s)\n", oldfilename);
 		return 1;
