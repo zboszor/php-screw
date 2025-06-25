@@ -31,6 +31,12 @@
 #endif
 
 #if PHP_VERSION_ID >= 70300
+#define USE_POST_STARTUP 0 /* This may be manually changed (0 or 1) */
+#else
+#define USE_POST_STARTUP 0 /* Don't change this! */
+#endif
+
+#if USE_POST_STARTUP
 static int (*php_screw_orig_post_startup_cb)(void);
 static int php_screw_post_startup(void);
 #endif
@@ -176,7 +182,7 @@ PHP_MINIT_FUNCTION(php_screw)
 	 * Redirect compile function to our own. For PHP 7.3 and
 	 * later, we hook it in php_screw_post_startup instead.
 	 */
-#if PHP_VERSION_ID < 70300
+#if USE_POST_STARTUP == 0
 	php_screw_base_post_startup();
 #endif
 	return SUCCESS;
@@ -189,7 +195,7 @@ void php_screw_base_shutdown(void)
 
 PHP_MSHUTDOWN_FUNCTION(php_screw)
 {
-#if PHP_VERSION_ID < 70300
+#if USE_POST_STARTUP == 0
 	php_screw_base_shutdown();
 #endif
 	return SUCCESS;
@@ -197,7 +203,7 @@ PHP_MSHUTDOWN_FUNCTION(php_screw)
 
 ZEND_DLEXPORT int php_screw_zend_startup(zend_extension *extension)
 {
-#if PHP_VERSION_ID >= 70300
+#if USE_POST_STARTUP == 1
 	php_screw_orig_post_startup_cb = zend_post_startup_cb;
 	zend_post_startup_cb = php_screw_post_startup;
 #endif
@@ -206,12 +212,12 @@ ZEND_DLEXPORT int php_screw_zend_startup(zend_extension *extension)
 
 ZEND_DLEXPORT void php_screw_zend_shutdown(zend_extension *extension)
 {
-#if PHP_VERSION_ID >= 70300
+#if USE_POST_STARTUP == 1
 	php_screw_base_shutdown();
 #endif
 }
 
-#if PHP_VERSION_ID >= 70300
+#if USE_POST_STARTUP == 1
 static int php_screw_post_startup(void)
 {
 	if (php_screw_orig_post_startup_cb) {
