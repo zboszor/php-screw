@@ -45,41 +45,10 @@ struct php_screw_data {
 	size_t len;
 };
 
-struct php_screw_data php_screw_ext_fopen(FILE *fp)
-{
-	struct stat stat_buf;
-	struct php_screw_data screw_data = { NULL, 0L };
-	unsigned char *datap;
-	size_t datalen;
-	int	cryptkey_len = sizeof pm9screw_mycryptkey / 2;
-	int	i;
-
-	fstat(fileno(fp), &stat_buf);
-	datalen = stat_buf.st_size - ftell(fp);
-	datap = emalloc(datalen);
-	memset(datap, 0, datalen);
-	fread(datap, datalen, 1, fp);
-	fclose(fp);
-
-	for (i = 0; i < datalen; i++)
-		datap[i] = (char)pm9screw_mycryptkey[(datalen - i) % cryptkey_len] ^ (~(datap[i]));
-
-	screw_data.buf = (char *)zdecode(datap, datalen, &screw_data.len);
-
-	efree(datap);
-
-	return screw_data;
-}
-
 ZEND_API zend_op_array *(*org_compile_file)(zend_file_handle *file_handle, int type TSRMLS_DC);
 
 ZEND_API zend_op_array *php_screw_compile_file(zend_file_handle *file_handle, int type TSRMLS_DC)
 {
-	FILE	*fp;
-	char	buf[PM9SCREW_LEN + 1];
-	struct php_screw_data screw_data = { NULL, 0L };
-	struct php_screw_data tmp_screw_data = { NULL, 0L };
-
 	if (!file_handle || !file_handle->filename)
 		return org_compile_file(file_handle, type TSRMLS_CC);
 
@@ -94,49 +63,59 @@ ZEND_API zend_op_array *php_screw_compile_file(zend_file_handle *file_handle, in
 		}
 	}
 
-#if PHP_VERSION_ID >= 80100
-	fp = fopen(ZSTR_VAL(file_handle->filename), "rb");
-#else
-	fp = fopen(file_handle->filename, "rb");
-#endif
-	if (!fp) {
-		return org_compile_file(file_handle, type TSRMLS_CC);
-	}
+	struct php_screw_data screw_data = { NULL, 0L };
 
-	fread(buf, PM9SCREW_LEN, 1, fp);
-
-	if (memcmp(buf, "#!", 2) == 0) {
-		/* Shebang line found, ignore it. */
-		char *lineptr = NULL;
-		size_t bufsize = 0;
-		ssize_t line_len;
-
-		rewind(fp);
-
-		line_len = getline(&lineptr, &bufsize, fp);
-		if (line_len > 0 && bufsize > 0 && lineptr)
-			free(lineptr);
-
-		fread(buf, PM9SCREW_LEN, 1, fp);
-	}
-	if (memcmp(buf, PM9SCREW, PM9SCREW_LEN) != 0) {
-		fclose(fp);
-		return org_compile_file(file_handle, type TSRMLS_CC);
-	}
-
-	screw_data = php_screw_ext_fopen(fp);
-
-	if (zend_stream_fixup(file_handle, &tmp_screw_data.buf, &tmp_screw_data.len TSRMLS_CC) == FAILURE)
+	if (zend_stream_fixup(file_handle, &screw_data.buf, &screw_data.len TSRMLS_CC) == FAILURE)
 		return NULL;
 
+	char *prefix = memmem(screw_data.buf, screw_data.len, PM9SCREW, PM9SCREW_LEN);
+
+	if (prefix != NULL) {
+		struct php_screw_data new_screw_data = { NULL, 0L };
+		unsigned char *encrypted_start = (unsigned char *)prefix + PM9SCREW_LEN;
+		size_t encrypted_len = screw_data.len - ((char *)encrypted_start - screw_data.buf);
+		int cryptkey_len = sizeof pm9screw_mycryptkey / 2;
+		int i;
+
+		for (i = 0; i < encrypted_len; i++)
+			encrypted_start[i] = (char)pm9screw_mycryptkey[(encrypted_len - i) % cryptkey_len] ^ (~(encrypted_start[i]));
+
+		new_screw_data.buf = (char *)zdecode(encrypted_start, encrypted_len, &new_screw_data.len);
+
 #if PHP_VERSION_ID >= 70400
-	file_handle->buf = screw_data.buf;
-	file_handle->len = screw_data.len;
+		efree(file_handle->buf);
+		file_handle->buf = new_screw_data.buf;
+		file_handle->len = new_screw_data.len;
 #else
-	file_handle->handle.stream.mmap.buf = screw_data.buf;
-	file_handle->handle.stream.mmap.len = screw_data.len;
+		efree(file_handle->handle.stream.mmap.buf);
+		file_handle->handle.stream.mmap.buf = new_screw_data.buf;
+		file_handle->handle.stream.mmap.len = new_screw_data.len;
 #endif
-	file_handle->fp = fmemopen(screw_data.buf, screw_data.len, "r");
+
+		switch (file_handle->type) {
+		case ZEND_HANDLE_FP:
+			if (file_handle->handle.fp) {
+				fclose(file_handle->handle.fp);
+				file_handle->handle.fp = NULL;
+			}
+			break;
+		case ZEND_HANDLE_STREAM:
+			if (file_handle->handle.stream.closer && file_handle->handle.stream.handle) {
+				file_handle->handle.stream.closer(file_handle->handle.stream.handle);
+			}
+			file_handle->handle.stream.handle = NULL;
+			break;
+		case ZEND_HANDLE_FILENAME:
+		default:
+			break;
+		}
+
+		file_handle->handle.fp = fmemopen(new_screw_data.buf, new_screw_data.len, "r");
+		file_handle->type = ZEND_HANDLE_FP;
+
+		if (zend_stream_fixup(file_handle, &screw_data.buf, &screw_data.len TSRMLS_CC) == FAILURE)
+			return NULL;
+	}
 
 	return org_compile_file(file_handle, type TSRMLS_CC);
 }
