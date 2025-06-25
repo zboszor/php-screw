@@ -76,17 +76,18 @@ ZEND_API zend_op_array *php_screw_compile_file(zend_file_handle *file_handle, in
 {
 	FILE	*fp;
 	char	buf[PM9SCREW_LEN + 1];
-	const char	*fname = NULL;
 #if PHP_VERSION_ID >= 70000
 	char	*opened_path;
 #endif
 
-	if (zend_is_executing(TSRMLS_C))
-		fname = get_active_function_name(TSRMLS_C);
-	if (fname && fname[0]) {
-		if ( strcasecmp(fname, "show_source") == 0
-		  || strcasecmp(fname, "highlight_file") == 0) {
-			return NULL;
+	if (zend_is_executing(TSRMLS_C)) {
+		const char *fname = get_active_function_name(TSRMLS_C);
+
+		if (fname && fname[0]) {
+			if ( strcasecmp(fname, "show_source") == 0
+			  || strcasecmp(fname, "highlight_file") == 0) {
+				return NULL;
+			}
 		}
 	}
 
