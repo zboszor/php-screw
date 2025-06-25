@@ -20,7 +20,7 @@
 #define PM9SCREW        "\tPM9SCREW\t"
 #define PM9SCREW_LEN     10
 
-unsigned char *zdecode(unsigned char *inbuf, int inbuf_len, int *resultbuf_len);
-unsigned char *zencode(unsigned char *inbuf, int inbuf_len, int *resultbuf_len);
+unsigned char *zdecode(unsigned char *inbuf, size_t inbuf_len, size_t *resultbuf_len);
+unsigned char *zencode(unsigned char *inbuf, size_t inbuf_len, size_t *resultbuf_len);
 
 #endif
