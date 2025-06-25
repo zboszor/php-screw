@@ -179,6 +179,12 @@ PHP_MINFO_FUNCTION(php_screw)
 	php_info_print_table_end();
 }
 
+void php_screw_base_post_startup(void)
+{
+	org_compile_file = zend_compile_file;
+	zend_compile_file = pm9screw_compile_file;
+}
+
 PHP_MINIT_FUNCTION(php_screw)
 {
 #if PHP_VERSION_ID < 70000
@@ -190,8 +196,7 @@ PHP_MINIT_FUNCTION(php_screw)
 	 * later, we hook it in php_screw_post_startup instead.
 	 */
 #if PHP_VERSION_ID < 70300
-	org_compile_file = zend_compile_file;
-	zend_compile_file = pm9screw_compile_file;
+	php_screw_base_post_startup();
 #endif
 	return SUCCESS;
 }
@@ -200,12 +205,6 @@ PHP_MSHUTDOWN_FUNCTION(php_screw)
 {
 	zend_compile_file = org_compile_file;
 	return SUCCESS;
-}
-
-void php_screw_base_post_startup()
-{
-	org_compile_file = zend_compile_file;
-	zend_compile_file = pm9screw_compile_file;
 }
 
 ZEND_DLEXPORT int php_screw_zend_startup(zend_extension *extension)
