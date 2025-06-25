@@ -80,6 +80,9 @@ ZEND_API zend_op_array *php_screw_compile_file(zend_file_handle *file_handle, in
 	char	*opened_path;
 #endif
 
+	if (!file_handle || !file_handle->filename)
+		return org_compile_file(file_handle, type TSRMLS_CC);
+
 	if (zend_is_executing(TSRMLS_C)) {
 		const char *fname = get_active_function_name(TSRMLS_C);
 
