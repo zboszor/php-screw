@@ -39,7 +39,7 @@ PHP_MSHUTDOWN_FUNCTION(php_screw);
 PHP_RINIT_FUNCTION(php_screw);
 PHP_MINFO_FUNCTION(php_screw);
 
-FILE *pm9screw_ext_fopen(FILE *fp)
+FILE *php_screw_ext_fopen(FILE *fp)
 {
 	struct	stat	stat_buf;
 	unsigned char *datap, *newdatap;
@@ -71,7 +71,7 @@ FILE *pm9screw_ext_fopen(FILE *fp)
 
 ZEND_API zend_op_array *(*org_compile_file)(zend_file_handle *file_handle, int type TSRMLS_DC);
 
-ZEND_API zend_op_array *pm9screw_compile_file(zend_file_handle *file_handle, int type TSRMLS_DC)
+ZEND_API zend_op_array *php_screw_compile_file(zend_file_handle *file_handle, int type TSRMLS_DC)
 {
 	FILE	*fp;
 	char	buf[PM9SCREW_LEN + 1];
@@ -123,7 +123,7 @@ ZEND_API zend_op_array *pm9screw_compile_file(zend_file_handle *file_handle, int
 #ifdef ZEND_HANDLE_FD
 	if (file_handle->type == ZEND_HANDLE_FD) close(file_handle->handle.fd);
 #endif
-	file_handle->handle.fp = pm9screw_ext_fopen(fp);
+	file_handle->handle.fp = php_screw_ext_fopen(fp);
 	file_handle->type = ZEND_HANDLE_FP;
 
 #if PHP_VERSION_ID >= 80100
@@ -182,7 +182,7 @@ PHP_MINFO_FUNCTION(php_screw)
 void php_screw_base_post_startup(void)
 {
 	org_compile_file = zend_compile_file;
-	zend_compile_file = pm9screw_compile_file;
+	zend_compile_file = php_screw_compile_file;
 }
 
 PHP_MINIT_FUNCTION(php_screw)
