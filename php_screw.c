@@ -44,7 +44,7 @@ FILE *php_screw_ext_fopen(FILE *fp)
 {
 	struct	stat	stat_buf;
 	unsigned char *datap, *newdatap;
-	int	datalen, newdatalen;
+	size_t	datalen, newdatalen;
 	int	cryptkey_len = sizeof pm9screw_mycryptkey / 2;
 	int	i;
 

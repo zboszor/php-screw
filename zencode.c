@@ -9,7 +9,7 @@
 
 #define OUTBUFSIZ  100000
 
-unsigned char *zcodecom(int mode, unsigned char *inbuf, int inbuf_len, int *resultbuf_len) {
+unsigned char *zcodecom(int mode, unsigned char *inbuf, size_t inbuf_len, size_t *resultbuf_len) {
 	z_stream z;
 	int count, status;
 	unsigned char *outbuf, *resultbuf;
@@ -94,10 +94,10 @@ unsigned char *zcodecom(int mode, unsigned char *inbuf, int inbuf_len, int *resu
 	return resultbuf;
 }
 
-unsigned char *zencode(unsigned char *inbuf, int inbuf_len, int *resultbuf_len) {
+unsigned char *zencode(unsigned char *inbuf, size_t inbuf_len, size_t *resultbuf_len) {
 	return zcodecom(0, inbuf, inbuf_len, resultbuf_len);
 }
 
-unsigned char *zdecode(unsigned char *inbuf, int inbuf_len, int *resultbuf_len) {
+unsigned char *zdecode(unsigned char *inbuf, size_t inbuf_len, size_t *resultbuf_len) {
 	return zcodecom(1, inbuf, inbuf_len, resultbuf_len);
 }

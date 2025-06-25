@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 	FILE	*fp;
 	struct	stat	stat_buf;
 	unsigned char	*datap, *orig_datap, *newdatap;
-	int	datalen, orig_datalen, newdatalen;
+	size_t datalen, orig_datalen, newdatalen;
 	int	cryptkey_len = sizeof pm9screw_mycryptkey / 2;
 	char	oldfilename[256];
 	int	i, found_shebang = 0;
