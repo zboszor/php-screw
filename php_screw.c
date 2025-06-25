@@ -58,17 +58,6 @@ ZEND_API zend_op_array *php_screw_compile_file(zend_file_handle *file_handle, in
 	if (!file_handle || !file_handle->filename)
 		return org_compile_file(file_handle, type TSRMLS_CC);
 
-	if (zend_is_executing(TSRMLS_C)) {
-		const char *fname = get_active_function_name(TSRMLS_C);
-
-		if (fname && fname[0]) {
-			if ( strcasecmp(fname, "show_source") == 0
-			  || strcasecmp(fname, "highlight_file") == 0) {
-				return NULL;
-			}
-		}
-	}
-
 	struct php_screw_data screw_data = { NULL, 0L };
 
 	if (zend_stream_fixup(file_handle, &screw_data.buf, &screw_data.len TSRMLS_CC) == FAILURE)
