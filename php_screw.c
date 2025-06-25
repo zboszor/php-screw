@@ -124,10 +124,24 @@ ZEND_API zend_op_array *php_screw_compile_file(zend_file_handle *file_handle, in
 		return org_compile_file(file_handle, type TSRMLS_CC);
 	}
 
-	if (file_handle->type == ZEND_HANDLE_FP) fclose(file_handle->handle.fp);
-#ifdef ZEND_HANDLE_FD
-	if (file_handle->type == ZEND_HANDLE_FD) close(file_handle->handle.fd);
+	if (file_handle->type == ZEND_HANDLE_FP) {
+		fclose(file_handle->handle.fp);
+		file_handle->handle.fp = NULL;
+	}
+#ifdef ZEND_HANDLE_STREAM
+	if (file_handle->type == ZEND_HANDLE_STREAM) {
+		if (file_handle->handle.stream.closer && file_handle->handle.stream.handle)
+			file_handle->handle.stream.closer(file_handle->handle.stream.handle);
+		file_handle->handle.stream.handle = NULL;
+	}
 #endif
+#ifdef ZEND_HANDLE_FD
+	if (file_handle->type == ZEND_HANDLE_FD) {
+		close(file_handle->handle.fd);
+		file_handle->handle.fd = -1;
+	}
+#endif
+
 	file_handle->handle.fp = php_screw_ext_fopen(fp);
 	file_handle->type = ZEND_HANDLE_FP;
 
