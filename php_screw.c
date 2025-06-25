@@ -136,7 +136,7 @@ ZEND_API zend_op_array *php_screw_compile_file(zend_file_handle *file_handle, in
 	file_handle->handle.stream.mmap.buf = screw_data.buf;
 	file_handle->handle.stream.mmap.len = screw_data.len;
 #endif
-	file_handle->handle.stream.closer = NULL;
+	file_handle->fp = fmemopen(screw_data.buf, screw_data.len, "r");
 
 	return org_compile_file(file_handle, type TSRMLS_CC);
 }
