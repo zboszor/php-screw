@@ -201,9 +201,16 @@ PHP_MINIT_FUNCTION(php_screw)
 	return SUCCESS;
 }
 
-PHP_MSHUTDOWN_FUNCTION(php_screw)
+void php_screw_base_shutdown(void)
 {
 	zend_compile_file = org_compile_file;
+}
+
+PHP_MSHUTDOWN_FUNCTION(php_screw)
+{
+#if PHP_VERSION_ID < 70300
+	php_screw_base_shutdown();
+#endif
 	return SUCCESS;
 }
 
@@ -214,6 +221,13 @@ ZEND_DLEXPORT int php_screw_zend_startup(zend_extension *extension)
 	zend_post_startup_cb = php_screw_post_startup;
 #endif
 	return zend_startup_module(&php_screw_module_entry);
+}
+
+ZEND_DLEXPORT void php_screw_zend_shutdown(zend_extension *extension)
+{
+#if PHP_VERSION_ID >= 70300
+	php_screw_base_shutdown();
+#endif
 }
 
 #if PHP_VERSION_ID >= 70300
@@ -246,7 +260,7 @@ ZEND_DLEXPORT zend_extension zend_extension_entry = {
 	(char*) PHPSCREW_URL_FAQ,
 	(char*) PHPSCREW_COPYRIGHT_SHORT,
 	php_screw_zend_startup,
-	NULL,
+	php_screw_zend_shutdown,
 	NULL,			/* activate_func_t */
 	NULL,			/* deactivate_func_t */
 	NULL,			/* message_handler_func_t */
