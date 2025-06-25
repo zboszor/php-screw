@@ -1,6 +1,7 @@
 /*
  * php_screw
  * (C) 2007, Kunimasa Noda/PM9.com, Inc. <http://www.pm9.com,  kuni@pm9.com>
+ * (C) 2020-2025, Zoltán Böszörményi <zboszor@gmail.com>
  * see file LICENSE for license details
  */
 
