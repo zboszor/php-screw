@@ -6,8 +6,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "../php_screw.h"
-#include "../my_screw.h"
+#include "php_screw.h"
+#include "my_screw.h"
 
 int main(int argc, char **argv) {
 	FILE	*fp;
