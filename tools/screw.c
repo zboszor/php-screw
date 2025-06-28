@@ -17,13 +17,13 @@
 #include "my_screw.h"
 
 int main(int argc, char **argv) {
-	FILE	*fp;
-	struct	stat	stat_buf;
-	unsigned char	*datap, *orig_datap, *newdatap;
+	FILE *fp;
+	struct stat stat_buf;
+	unsigned char *datap, *orig_datap, *newdatap;
 	size_t datalen, orig_datalen, newdatalen;
 	int	cryptkey_len = sizeof pm9screw_mycryptkey / 2;
-	char	oldfilename[256];
-	int	i, found_shebang = 0;
+	char oldfilename[256];
+	int i, found_shebang = 0;
 
 	if (argc != 2) {
 		fprintf(stderr, "Usage: filename.\n");
@@ -90,6 +90,10 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "Can not create crypt file(%s)\n", oldfilename);
 		return 1;
 	}
+
+	fchown(fileno(fp), stat_buf.st_uid, stat_buf.st_gid);
+	fchmod(fileno(fp), stat_buf.st_mode & ACCESSPERMS);
+
 	if (found_shebang)
 		fwrite(orig_datap, orig_datalen - datalen, 1, fp);
 	fwrite(PM9SCREW, PM9SCREW_LEN, 1, fp);
